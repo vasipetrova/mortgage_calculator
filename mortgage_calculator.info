@@ -1,0 +1,9 @@
+name = Mortgage Calculator
+description = Mortgage Calculator
+package = Mortgage Calculator
+core = 7.x
+dependencies[] = block
+
+stylesheets[all][] = /css/mortgage_calculator.css
+
+scripts[] = /js/mortgage_calculator.js

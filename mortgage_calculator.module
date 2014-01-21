@@ -1,0 +1,179 @@
+<?php
+/**
+ * @file
+ * Module file for mortgage_calculator.
+ *
+ */
+
+/**
+ * @defgroup mortgage_calculator
+ *
+ * This module creates a mortgage calculator block and uses the form API
+ * to define the individual fields of the mortgage calculator.
+ *
+ */
+
+
+/**
+ * Implements hook_block_info().
+ *
+ */
+function mortgage_calculator_block_info() {
+  $blocks['mortgage_calculator'] = array(
+    'info' => t('Mortgage Calculator'),
+		'region' => BLOCK_REGION_NONE,
+    'status' => true,
+    'cache' => DRUPAL_NO_CACHE
+  );
+
+  return $blocks;
+}
+
+/**
+ * Implements a form for the mortgage calculator.
+ *
+ */
+function mortgage_calculator_form($delta = '') {
+  // The $delta parameter tells us which block is being configured, but since
+  // this module has only one block we are not using it.
+
+  $form = array();
+
+	$form['mortgage_calculator_purchase_price'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Purchase Price ($)'),
+		'#size' => 10,
+		'#default_value' => 0,
+		'#required' => TRUE,
+		'#attributes' => array(
+			'class' => array('numeric')
+		)
+	);
+
+	$form['mortgage_calculator_purchase_price_message'] = array(
+  	'#type' => 'markup',
+    '#prefix' => '<div class="numeric error-message">',
+    '#suffix' => '</div>'
+  );
+	
+	$form['mc_fieldset'] = array(
+		'#type' => 'fieldset',
+		'#attributes' => array('class' => array('inline-fieldset'))
+	);
+	
+	$form['mc_fieldset']['mortgage_calculator_down_payment'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Downpayment ($)'),
+		'#size' => 10,
+		'#default_value' => '0',
+		'#required' => FALSE,
+		'#attributes' => array(
+			'class' => array('numeric')
+		),		
+		'#ajax' => array(
+			'callback' => 'ajax_calculate_downpayment_percent',
+			'wrapper' => 'mortgage_calculator_downpayment_percent'
+		)		
+	);
+
+	$form['mc_fieldset']['mortgage_calculator_downpayment_percent'] = array(
+  	'#type' => 'markup',
+    '#prefix' => '<div id="mortgage_calculator_downpayment_percent" class="form-item">(',
+    '#suffix' => ' %)</div>'
+  );
+
+	$form['mc_fieldset']['mortgage_calculator_down_payment_message'] = array(
+	'#type' => 'markup',
+	'#prefix' => '<div class="error-message">',
+	'#suffix' => '</div>'
+	);
+
+	// Set the initial value of the field to 0  
+  $form['mc_fieldset']['mortgage_calculator_downpayment_percent']['#markup'] = 0;	
+	
+	$form['mortgage_calculator_term'] = array(
+		'#type' => 'select',
+		'#title' => t('Mortgage Term (years)'),
+		'#options' => array (
+			25 => t('25'),
+			30 => t('30')			
+		),
+		'#required' => TRUE,
+		'#default_value' => '0'
+	);
+
+	$form['mortgage_calculator_interest_rate'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Interest Rate (%)'),
+		'#size' => 10,
+		'#default_value' => '0.00',
+		'#required' => TRUE,
+		'#attributes' => array(
+			'class' => array('percent')
+		)
+	);
+	
+		$form['mortgage_calculator_interest_rate_message'] = array(
+  	'#type' => 'markup',
+    '#prefix' => '<div class="percent error-message">',
+    '#suffix' => '</div>'
+  );
+
+
+  $form['submit'] = array(
+    '#type' => 'button',
+    '#value' => t('Calculate'),
+		'#attributes' => array(
+			'id' => array('mc-calculateBtn')
+		)    
+  );
+
+	$form['mortgage_calculator_monthly_payment'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Monthly Payment ($)'),
+    '#size' => 10,
+    '#maxlength' => 64,
+    '#attributes' => array(
+    	'readonly' => array('readonly')
+    )
+  );
+    
+  return $form;
+}
+
+/**
+ * Implements hook_block_view().
+ *
+ * This hook generates the contents of the blocks themselves.
+ */
+function mortgage_calculator_block_view($delta = '') {
+  // The $delta parameter tells us which block is being requested.
+
+	$block = array();
+	
+	$block['subject'] = t('Mortgage Calculator');
+	$form = drupal_get_form('mortgage_calculator_form');
+	$block['content'] = $form;
+	
+  return $block;
+}
+
+/**
+ * 
+ *	Calculates the percentage of downpayment.
+ * 
+ */
+function ajax_calculate_downpayment_percent($form, &$form_state)
+{
+	// Calculate the downpayment as a percentage = (downpayment / purchase_price) * 100
+	$downpaymentAsPercent = round(((int) $form['mc_fieldset']['mortgage_calculator_down_payment']['#value'] / (int) $form['mortgage_calculator_purchase_price']['#value'] ) * 100, 2);
+	// Convert the downpayment to string so it can be added to a field
+	$downpaymentPercentString = (string) $downpaymentAsPercent;
+	
+	$form['mc_fieldset']['mortgage_calculator_downpayment_percent']['#markup'] = t('@percent', array('@percent' => $downpaymentPercentString));
+
+	return $form['mc_fieldset']['mortgage_calculator_downpayment_percent'];
+}
+/**
+ * @} End of "defgroup mortgage_calculator".
+ */

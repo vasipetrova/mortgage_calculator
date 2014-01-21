@@ -1,0 +1,54 @@
+#mortgage-calculator-form fieldset.inline-fieldset .form-item
+{
+	display: inline-block;
+	margin-right: 10px;
+}
+
+#mortgage-calculator-form .form-item
+{
+	margin-bottom: 20px;
+}
+
+
+#mortgage-calculator-form input.error
+{
+	border-color: #b94a48;
+	background-color: #f2dede;
+}
+
+
+#mortgage-calculator-form div.error-message
+{
+	display: none;
+	position: relative;
+	background-color: #b94a48;
+	color: #FFFFFF;
+	padding: 5px;
+	margin-top: -5px;
+	margin-bottom: 10px;
+}
+
+#mortgage-calculator-form div.error-message:before
+{
+	content:'';
+	display: block;
+	position: absolute;
+	top: -20px; /*should be set to -border-width x 2 */
+	left: 15px;
+	width: 0;
+	height: 0;
+	border-color: transparent transparent #b94a48 transparent; /*border color should be same as div div background color*/
+	border-style: solid;
+	border-width: 10px;
+}
+
+#mortgage-calculator-form .form-item-mortgage-calculator-monthly-payment
+{
+	margin-top: 20px;
+}
+
+#mortgage-calculator-form .form-item-mortgage-calculator-monthly-payment input.highlight
+{
+	background-color: #F0FFF0;
+	border-color: #397D02;
+}
